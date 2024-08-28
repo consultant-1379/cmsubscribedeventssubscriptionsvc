@@ -1,0 +1,120 @@
+{
+  "type": "object",
+  "properties": {
+    "event": {
+      "type": "object",
+      "properties": {
+        "commonEventHeader": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "const": "4.1"
+            },
+            "vesEventListenerVersion": {
+              "const": "7.2.1"
+            },
+            "domain": {
+              "const": "heartbeat"
+            },
+            "stndDefinedNamespace": {
+              "const": "3GPP-Heartbeat"
+            },
+            "eventName": {
+              "const": "Heartbeat_ENM-Ericsson_VES"
+            },
+            "eventId": {
+              "type": "string",
+              "pattern": "^Heartbeat_"
+            },
+            "sequence": {
+              "const": 0
+            },
+            "priority": {
+              "const": "High"
+            },
+            "reportingEntityName": {
+              "const": "serverName"
+            },
+            "sourceName": {
+              "const": "serverName"
+            },
+            "nfVendorName": {
+              "const": "Ericsson"
+            },
+            "startEpochMicrosec": {
+              "type": "integer"
+            },
+            "lastEpochMicrosec": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "version",
+            "vesEventListenerVersion",
+            "domain",
+            "stndDefinedNamespace",
+            "eventName",
+            "eventId",
+            "sequence",
+            "priority",
+            "reportingEntityName",
+            "sourceName",
+            "nfVendorName",
+            "startEpochMicrosec",
+            "lastEpochMicrosec"
+          ]
+        },
+        "stndDefinedFields": {
+          "type": "object",
+          "properties": {
+            "stndDefinedFieldsVersion": {
+              "const": "1.0"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "href": {
+                  "const": "serverName"
+                },
+                "notificationId": {
+                  "type": "integer"
+                },
+                "notificationType": {
+                  "const": "Heartbeat"
+                },
+                "eventTime": {
+                  "type": "string"
+                },
+                "systemDN": {
+                  "const": "serverName"
+                },
+                "heartbeatNtfPeriod": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "href",
+                "notificationId",
+                "notificationType",
+                "eventTime",
+                "systemDN",
+                "heartbeatNtfPeriod"
+              ]
+            }
+          },
+          "required": [
+            "stndDefinedFieldsVersion",
+            "data"
+          ]
+        }
+      },
+      "required": [
+        "commonEventHeader",
+        "stndDefinedFields"
+      ]
+    }
+  },
+  "required": [
+    "event"
+  ]
+}

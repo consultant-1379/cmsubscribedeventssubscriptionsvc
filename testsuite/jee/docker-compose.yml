@@ -1,0 +1,74 @@
+version: "2.1"
+
+services:
+  #Image containing models
+  model-deployment:
+    container_name: model_deployment_cmevents
+    image: armdocker.rnd.ericsson.se/proj_oss_releases/enm/model-deployment
+    volumes:
+    - /etc/opt/ericsson/ERICmodeldeployment
+    - /etc/opt/ericsson/ERICmodeldeployment/data
+    - /etc/opt/ericsson/ERICmodeldeployment/models
+
+  #Image containing neo4j
+  neo4j:
+    container_name: cmevents_neo4j
+    image: armdocker.rnd.ericsson.se/proj_oss_releases/enm/neo4j4
+    ports:
+    - '7474:7474'
+    - '7473:7473'
+    - '7687:7687'
+    hostname: neo4j1
+
+  postgres:
+    image: armdocker.rnd.ericsson.se/proj_oss_releases/enm/postgres-enm
+    ports:
+      - "5432:5432"
+    hostname: postgresql-server
+
+  access_control:
+    container_name: access_control_service_cmevents
+    image: armdocker.rnd.ericsson.se/proj_oss_releases/enm/access-control:latest
+    volumes:
+      - ./src/test/docker/access_control/config:/opt/ericsson/docker/config
+
+  wiremock:
+    container_name: wiremock_cmevents
+    image: wiremock/wiremock
+    command: "--https-port 8443 --port 8181 --verbose --https-keystore /home/wiremock/certs/wiremock_ee.jks --keystore-password Cmevents1 --key-manager-password Cmevents1"
+    volumes:
+      - ./src/test/docker/wiremock/mappings:/home/wiremock/mappings
+      - ./src/test/docker/wiremock/certs:/home/wiremock/certs
+    healthcheck:
+      test: curl -f http://localhost:8181/__admin/health || exit 1
+    ports:
+      - "8443:8443"
+      - "8181:8181"
+    hostname: wiremock-server
+
+  jboss:
+    container_name: cmevents_jboss_service
+    build: ./src/test/docker/jboss
+    links:
+      - neo4j:neo4j1
+      - postgres:postgresql-server
+      - access_control:ldap-remote
+      - access_control:ldap-local
+      - wiremock:wiremock-server
+    depends_on:
+      - model-deployment
+      - neo4j
+      - wiremock
+    volumes:
+      - ./src/test/docker/jboss/config:/opt/ericsson/docker/config
+    volumes_from:
+      - neo4j
+      - access_control
+      - model-deployment
+    environment:
+      - JAVA_OPTS=-Xms6g -Xmx6g -XX:PermSize=512m -XX:MaxPermSize=1g -Djboss.as.management.blocking.timeout=1200 -verbose:class -Ddps_ignore_mediation=true -DbaseDn=dc=vts,dc=com -Dcm_VIP=127.0.0.1 -Dmsap_IPv6_IPs=0:0:0:0:0:0:0:1 -Djboss.modules.system.pkgs=com.sun.crypto.provider -Dneo4j.server.hostname=neo4j1 -Dneo4j.serverTransport=bolt -DpresentationServerName=integrationtestserver.athtem.eei.ericsson.se -Djavax.net.ssl.trustStore=/ericsson/3pp/jboss/standalone/configuration/wiremockKeystore.jks -Djavax.net.ssl.trustStorePassword=secret -XX:-UseGCOverheadLimit -Djavax.net.debug=ssl:handshake
+    ports:
+      - "9999:9999"
+      - "9990:9990"
+      - "8282:8080"
+      - "8787:8787"

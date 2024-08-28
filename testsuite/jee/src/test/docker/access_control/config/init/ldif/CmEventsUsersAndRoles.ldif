@@ -1,0 +1,51 @@
+# Users
+# ------------------------------------------------------------------------------
+
+dn: uid=cmeventsnbi_admin,ou=People,dc=vts,dc=com
+uid: cmeventsnbi_admin
+cn: Administrator
+sn: Admin
+userType: enmUser
+userPassword: T3stP4ssw0rd
+ds-pwp-account-disabled: false
+objectClass: person
+objectClass: userTypeOC
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: top
+
+dn: uid=cmeventsnbi_operator,ou=People,dc=vts,dc=com
+uid: cmeventsnbi_operator
+cn: Operator
+sn: Operator
+userType: enmUser
+userPassword: T3stP4ssw0rd
+ds-pwp-account-disabled: false
+objectClass: person
+objectClass: userTypeOC
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: top
+
+# Roles
+# ------------------------------------------------------------------------------
+
+dn: cn=CM_EVENTSNBI_Administrator,ou=Roles,dc=vts,dc=com
+objectClass: groupOfUniqueNames
+
+dn: cn=CM_EVENTSNBI_Operator,ou=Roles,dc=vts,dc=com
+objectClass: groupOfUniqueNames
+
+# Roles Assignment
+# ------------------------------------------------------------------------------
+
+dn: cn=CM_EVENTSNBI_Administrator,ou=Roles,dc=vts,dc=com
+changetype: modify
+add: uniqueMember
+uniqueMember: uid=cmeventsnbi_admin,ou=People,dc=vts,dc=com
+
+dn: cn=CM_EVENTSNBI_Operator,ou=Roles,dc=vts,dc=com
+changetype: modify
+add: uniqueMember
+uniqueMember: uid=cmeventsnbi_operator,ou=People,dc=vts,dc=com
+
